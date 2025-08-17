@@ -1,9 +1,12 @@
 import Navigation from "@/components/ui/navigation";
 import Footer from "@/components/ui/footer";
 import { Card } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Heart, Target, Lightbulb } from "lucide-react";
 
 const About = () => {
+  const { t } = useLanguage();
+  
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -12,11 +15,11 @@ const About = () => {
       <section className="pt-24 pb-16 px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <h1 className="text-4xl lg:text-5xl font-playfair font-bold text-primary mb-6">
-            Who We Are
+            {t('about.title')}
           </h1>
           <div className="w-24 h-1 bg-accent mx-auto mb-8"></div>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Vishva Vijaya Foundation (VVF) is a non-profit initiative dedicated to taking Bharat's Vijaya to the global stage.
+            {t('about.intro')}
           </p>
         </div>
       </section>
@@ -26,9 +29,7 @@ const About = () => {
         <div className="container mx-auto max-w-4xl">
           <div className="prose prose-lg max-w-none">
             <p className="text-muted-foreground leading-relaxed mb-8">
-              For centuries, Vijaya has been revered in Bharat as a sacred sacrament — celebrated in rituals, wellness, and culture. 
-              Today, the world is rediscovering its value, and VVF is leading the effort to ensure that this rediscovery is rooted 
-              in authentic knowledge and respect.
+              {t('about.description')}
             </p>
           </div>
         </div>
@@ -38,7 +39,7 @@ const About = () => {
       <section className="py-16 px-6 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl lg:text-4xl font-playfair font-bold text-primary text-center mb-16">
-            Our Mission
+            {t('about.mission.title')}
           </h2>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -52,7 +53,7 @@ const About = () => {
                 Advance Knowledge
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Through research, documentation, and collaborations with scientists, scholars, and traditional practitioners.
+                {t('about.mission.advance')}
               </p>
             </Card>
             
@@ -66,7 +67,7 @@ const About = () => {
                 Enable Change
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                By developing education, awareness programs, and legal solutions that remove stigma.
+                {t('about.mission.enable')}
               </p>
             </Card>
             
@@ -80,7 +81,7 @@ const About = () => {
                 Revive Culture
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                By catalysing a renaissance that reconnects society with the true essence of Vijaya.
+                {t('about.mission.revive')}
               </p>
             </Card>
           </div>
@@ -91,28 +92,28 @@ const About = () => {
       <section className="py-20 px-6">
         <div className="container mx-auto max-w-4xl">
           <h2 className="text-3xl lg:text-4xl font-playfair font-bold text-primary text-center mb-12">
-            Why It Matters
+            {t('about.why.title')}
           </h2>
           
           <div className="space-y-8">
             <div className="flex items-start space-x-4">
               <div className="w-2 h-2 bg-accent rounded-full mt-3 flex-shrink-0"></div>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                <span className="font-semibold text-primary">Restoring dignity</span> to a sacred plant misrepresented for decades.
+                {t('about.why.dignity')}
               </p>
             </div>
             
             <div className="flex items-start space-x-4">
               <div className="w-2 h-2 bg-accent rounded-full mt-3 flex-shrink-0"></div>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                <span className="font-semibold text-primary">Empowering communities</span> through knowledge, wellness, and cultural pride.
+                {t('about.why.empowering')}
               </p>
             </div>
             
             <div className="flex items-start space-x-4">
               <div className="w-2 h-2 bg-accent rounded-full mt-3 flex-shrink-0"></div>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                <span className="font-semibold text-primary">Building a bridge</span> between Bharat's heritage and the world's future.
+                {t('about.why.bridge')}
               </p>
             </div>
           </div>

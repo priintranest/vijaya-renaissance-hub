@@ -1,13 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ChevronDown, Globe } from "lucide-react";
 
 const Navigation = () => {
   const location = useLocation();
+  const { language, setLanguage, t } = useLanguage();
 
   const navItems = [
-    { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Join Waitlist", path: "/waitlist" },
+    { name: t('nav.home'), path: "/" },
+    { name: t('nav.about'), path: "/about" },
+    { name: t('nav.waitlist'), path: "/waitlist" },
   ];
 
   return (
@@ -24,11 +28,11 @@ const Navigation = () => {
               className="w-12 h-12 object-contain"
             />
             <span className="text-2xl font-playfair font-semibold text-primary">
-              Vishva Vijaya Foundation
+              {t('nav.foundation')}
             </span>
           </Link>
           
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -43,6 +47,35 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Language Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center space-x-1 font-inter font-medium text-muted-foreground hover:text-accent transition-colors">
+                <Globe className="w-4 h-4" />
+                <span>{language === 'hi' ? 'हिं' : 'EN'}</span>
+                <ChevronDown className="w-3 h-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-background border border-border shadow-lg">
+                <DropdownMenuItem 
+                  onClick={() => setLanguage('en')}
+                  className={cn(
+                    "cursor-pointer",
+                    language === 'en' && "bg-accent/10 text-accent"
+                  )}
+                >
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setLanguage('hi')}
+                  className={cn(
+                    "cursor-pointer",
+                    language === 'hi' && "bg-accent/10 text-accent"
+                  )}
+                >
+                  हिंदी
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile menu button */}

@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Footer = () => {
+  const { t } = useLanguage();
+  
   return (
     <footer className="bg-primary text-primary-foreground py-12 px-6">
       <div className="container mx-auto max-w-6xl">
@@ -16,7 +19,7 @@ const Footer = () => {
               />
               <div className="text-left">
                 <h3 className="text-xl font-playfair font-bold">
-                  Vishva Vijaya Foundation
+                  {t('nav.foundation')}
                 </h3>
                 <p className="text-sm opacity-80">विश्व विजया दातृत्व विज्ञानम्</p>
               </div>
@@ -28,13 +31,13 @@ const Footer = () => {
             <h4 className="font-playfair font-semibold text-lg">Quick Links</h4>
             <nav className="flex flex-col space-y-2 text-center">
               <Link to="/" className="hover:text-accent transition-colors">
-                Home
+                {t('nav.home')}
               </Link>
               <Link to="/about" className="hover:text-accent transition-colors">
-                About
+                {t('nav.about')}
               </Link>
               <Link to="/waitlist" className="hover:text-accent transition-colors">
-                Join Waitlist
+                {t('nav.waitlist')}
               </Link>
             </nav>
           </div>
@@ -43,18 +46,17 @@ const Footer = () => {
           <div className="flex flex-col items-center md:items-end text-center md:text-right space-y-4">
             <h4 className="font-playfair font-semibold text-lg">Our Mission</h4>
             <p className="text-sm opacity-90 max-w-xs leading-relaxed">
-              Taking Bharat's sacred Vijaya to the world through knowledge, 
-              healing, and cultural renaissance.
+              {t('footer.mission')}
             </p>
           </div>
         </div>
         
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center">
           <p className="text-sm opacity-80">
-            © 2024 Vishva Vijaya Foundation — All Rights Reserved.
+            © 2024 {t('nav.foundation')} — {t('footer.copyright')}
           </p>
           <p className="text-sm opacity-70 mt-2">
-            🌱 Together, let's reclaim and share the true spirit of Vijaya with the world.
+            🌱 {t('waitlist.closing')}
           </p>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import handsImage from "@/assets/hands-offering-leaf.jpg";
 
 const Waitlist = () => {
@@ -18,6 +19,7 @@ const Waitlist = () => {
   });
 
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,12 +64,11 @@ const Waitlist = () => {
       <section className="pt-24 pb-16 px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <h1 className="text-4xl lg:text-5xl font-playfair font-bold text-primary mb-6">
-            Be Part of the Movement
+            {t('waitlist.title')}
           </h1>
           <div className="w-24 h-1 bg-accent mx-auto mb-8"></div>
           <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            The world is ready for a new conversation around Vijaya — one that is authentic, research-driven, 
-            and rooted in Bharat's tradition.
+            {t('waitlist.subtitle')}
           </p>
         </div>
       </section>
@@ -81,7 +82,7 @@ const Waitlist = () => {
             <div className="space-y-8">
               <div>
                 <h2 className="text-2xl lg:text-3xl font-playfair font-bold text-primary mb-6">
-                  By joining the Vishva Vijaya Foundation waitlist, you will:
+                  {t('waitlist.benefits')}
                 </h2>
                 
                 <div className="space-y-6">
@@ -90,7 +91,7 @@ const Waitlist = () => {
                       <span className="text-accent-foreground text-sm font-bold">✓</span>
                     </div>
                     <p className="text-muted-foreground leading-relaxed">
-                      Get early access to insights, research, and events.
+                      {t('waitlist.benefit1')}
                     </p>
                   </div>
                   
@@ -99,7 +100,7 @@ const Waitlist = () => {
                       <span className="text-accent-foreground text-sm font-bold">✓</span>
                     </div>
                     <p className="text-muted-foreground leading-relaxed">
-                      Join a community of changemakers shaping the narrative of Vijaya.
+                      {t('waitlist.benefit2')}
                     </p>
                   </div>
                   
@@ -108,7 +109,7 @@ const Waitlist = () => {
                       <span className="text-accent-foreground text-sm font-bold">✓</span>
                     </div>
                     <p className="text-muted-foreground leading-relaxed">
-                      Contribute to policy, education, and cultural revival.
+                      {t('waitlist.benefit3')}
                     </p>
                   </div>
                 </div>
@@ -127,12 +128,12 @@ const Waitlist = () => {
             {/* Form Section */}
             <Card className="p-8 shadow-sacred">
               <h3 className="text-2xl font-playfair font-bold text-primary text-center mb-6">
-                Join the Waitlist
+                {t('waitlist.form.submit')}
               </h3>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-primary font-medium">Name</Label>
+                  <Label htmlFor="name" className="text-primary font-medium">{t('waitlist.form.name')}</Label>
                   <Input
                     id="name"
                     type="text"
@@ -144,7 +145,7 @@ const Waitlist = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-primary font-medium">Email</Label>
+                  <Label htmlFor="email" className="text-primary font-medium">{t('waitlist.form.email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -156,7 +157,7 @@ const Waitlist = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="country" className="text-primary font-medium">Country</Label>
+                  <Label htmlFor="country" className="text-primary font-medium">{t('waitlist.form.country')}</Label>
                   <Input
                     id="country"
                     type="text"
@@ -168,7 +169,7 @@ const Waitlist = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="profession" className="text-primary font-medium">Profession</Label>
+                  <Label htmlFor="profession" className="text-primary font-medium">{t('waitlist.form.profession')}</Label>
                   <Select value={formData.profession} onValueChange={(value) => handleChange("profession", value)}>
                     <SelectTrigger className="border-border/50 focus:ring-primary">
                       <SelectValue placeholder="Select your profession" />
@@ -191,7 +192,7 @@ const Waitlist = () => {
                   className="w-full bg-accent hover:bg-primary text-accent-foreground hover:text-primary-foreground shadow-gold transition-all duration-300"
                   size="lg"
                 >
-                  Join the Waitlist
+                  {t('waitlist.form.submit')}
                 </Button>
               </form>
             </Card>
@@ -203,7 +204,7 @@ const Waitlist = () => {
       <section className="py-16 px-6 bg-gradient-subtle">
         <div className="container mx-auto max-w-4xl text-center">
           <p className="text-2xl lg:text-3xl font-playfair font-medium text-primary mb-8">
-            🌱 Together, let's reclaim and share the true spirit of Vijaya with the world.
+            🌱 {t('waitlist.closing')}
           </p>
         </div>
       </section>
