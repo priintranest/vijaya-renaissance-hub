@@ -13,9 +13,7 @@ import handsImage from "@/assets/hands-offering-leaf.jpg";
 const Waitlist = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    country: "",
-    profession: ""
+    email: ""
   });
 
   const { toast } = useToast();
@@ -25,10 +23,10 @@ const Waitlist = () => {
     e.preventDefault();
     
     // Basic validation
-    if (!formData.name || !formData.email || !formData.country || !formData.profession) {
+    if (!formData.name || !formData.email) {
       toast({
         title: "Please fill in all fields",
-        description: "All fields are required to join the waitlist.",
+        description: "Name and email are required to join the waitlist.",
         variant: "destructive"
       });
       return;
@@ -43,9 +41,7 @@ const Waitlist = () => {
     // Reset form
     setFormData({
       name: "",
-      email: "",
-      country: "",
-      profession: ""
+      email: ""
     });
   };
 
@@ -154,37 +150,6 @@ const Waitlist = () => {
                     onChange={(e) => handleChange("email", e.target.value)}
                     className="border-border/50 focus:ring-primary"
                   />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="country" className="text-primary font-medium">{t('waitlist.form.country')}</Label>
-                  <Input
-                    id="country"
-                    type="text"
-                    placeholder="Your country"
-                    value={formData.country}
-                    onChange={(e) => handleChange("country", e.target.value)}
-                    className="border-border/50 focus:ring-primary"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="profession" className="text-primary font-medium">{t('waitlist.form.profession')}</Label>
-                  <Select value={formData.profession} onValueChange={(value) => handleChange("profession", value)}>
-                    <SelectTrigger className="border-border/50 focus:ring-primary">
-                      <SelectValue placeholder="Select your profession" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="researcher">Researcher</SelectItem>
-                      <SelectItem value="healthcare">Healthcare Professional</SelectItem>
-                      <SelectItem value="educator">Educator</SelectItem>
-                      <SelectItem value="advocate">Advocate/Activist</SelectItem>
-                      <SelectItem value="policymaker">Policymaker</SelectItem>
-                      <SelectItem value="entrepreneur">Entrepreneur</SelectItem>
-                      <SelectItem value="student">Student</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
                 
                 <Button 
