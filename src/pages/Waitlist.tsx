@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Navigation from "@/components/ui/navigation";
+import Footer from "@/components/ui/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -204,12 +205,10 @@ const Waitlist = () => {
           <p className="text-2xl lg:text-3xl font-playfair font-medium text-primary mb-8">
             🌱 Together, let's reclaim and share the true spirit of Vijaya with the world.
           </p>
-          
-          <div className="text-sm text-muted-foreground">
-            © Vishva Vijaya Foundation — All Rights Reserved.
-          </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };

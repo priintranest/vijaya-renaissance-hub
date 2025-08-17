@@ -1,4 +1,5 @@
 import Navigation from "@/components/ui/navigation";
+import Footer from "@/components/ui/footer";
 import { Card } from "@/components/ui/card";
 import { Heart, Target, Lightbulb } from "lucide-react";
 
@@ -117,6 +118,8 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Navigation from "@/components/ui/navigation";
+import Footer from "@/components/ui/footer";
 import heroImage from "@/assets/vijaya-leaf-hero.jpg";
 import templeIcon from "@/assets/temple-icon.jpg";
 import { BookOpen, FlaskConical, Scale } from "lucide-react";
@@ -129,6 +130,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };

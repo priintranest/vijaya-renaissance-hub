@@ -16,9 +16,16 @@ const Navigation = () => {
         <div className="flex items-center justify-between">
           <Link 
             to="/" 
-            className="text-2xl font-playfair font-semibold text-primary hover:text-accent transition-colors"
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
           >
-            Vishva Vijaya Foundation
+            <img 
+              src="/lovable-uploads/61159d8a-0fa4-410c-9980-ea58769eab06.png" 
+              alt="Vishva Vijaya Foundation Logo" 
+              className="w-12 h-12 object-contain"
+            />
+            <span className="text-2xl font-playfair font-semibold text-primary">
+              Vishva Vijaya Foundation
+            </span>
           </Link>
           
           <div className="hidden md:flex space-x-8">
