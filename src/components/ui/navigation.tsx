@@ -26,7 +26,7 @@ const Navigation = () => {
             className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
           >
             <img 
-              src="/lovable-uploads/61159d8a-0fa4-410c-9980-ea58769eab06.png" 
+              src="/lovable-uploads/2f5b413c-440d-4c0a-ae3f-8298ca460c7a.png" 
               alt="Vishva Vijaya Foundation Logo" 
               className="w-12 h-12 object-contain bg-transparent"
             />
