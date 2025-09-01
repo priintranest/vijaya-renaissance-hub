@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { submitWaitlistForm } from "@/lib/waitlist";
+import { submitWaitlist } from "@/lib/waitlist";
 import handsImage from "@/assets/hands-offering-leaf.jpg";
 
 const Waitlist = () => {
@@ -38,7 +38,7 @@ const Waitlist = () => {
 
     try {
       // Save to database
-      const result = await submitWaitlistForm(formData);
+      const result = await submitWaitlist(formData);
       
       if (result.success) {
         toast({
