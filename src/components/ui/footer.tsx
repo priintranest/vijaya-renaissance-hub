@@ -36,7 +36,7 @@ const Footer = () => {
         
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center">
           <p className="text-sm opacity-80">
-            © 2024 {t('nav.foundation')} — {t('footer.copyright')}
+            © 2025 {t('nav.foundation')} — {t('footer.copyright')}
           </p>
           <p className="text-sm opacity-70 mt-2">
             🌱 {t('waitlist.closing')}
