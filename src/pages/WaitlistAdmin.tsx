@@ -7,7 +7,9 @@ interface WaitlistEntry {
   id: number;
   name: string;
   email: string;
-  createdAt: string;
+  phone?: string;
+  interest?: string;
+  submitted_at: string;
 }
 
 const WaitlistAdmin = () => {
@@ -47,7 +49,7 @@ const WaitlistAdmin = () => {
       ...entries.map(entry => [
         entry.name,
         entry.email,
-        new Date(entry.createdAt).toLocaleString()
+        new Date(entry.submitted_at).toLocaleString()
       ])
     ].map(row => row.join(',')).join('\n');
 
@@ -135,7 +137,7 @@ const WaitlistAdmin = () => {
                       <td className="py-3 px-4 font-medium">{entry.name}</td>
                       <td className="py-3 px-4 text-sm">{entry.email}</td>
                       <td className="py-3 px-4 text-sm">
-                        {new Date(entry.createdAt).toLocaleString()}
+                        {new Date(entry.submitted_at).toLocaleString()}
                       </td>
                     </tr>
                   ))}
