@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { submitWaitlistForm } from "@/lib/waitlist";
 import handsImage from "@/assets/hands-offering-leaf.jpg";
 
 const Waitlist = () => {
@@ -15,11 +16,12 @@ const Waitlist = () => {
     name: "",
     email: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
@@ -32,17 +34,42 @@ const Waitlist = () => {
       return;
     }
 
-    // Simulate form submission
-    toast({
-      title: "Welcome to the movement! 🌱",
-      description: "You've been added to our waitlist. We'll be in touch soon.",
-    });
+    setIsSubmitting(true);
 
-    // Reset form
-    setFormData({
-      name: "",
-      email: ""
-    });
+    try {
+      // Save to database
+      const result = await submitWaitlistForm(formData);
+      
+      if (result.success) {
+        toast({
+          title: "Welcome to the movement! 🌱",
+          description: "You've been successfully added to our waitlist database.",
+        });
+
+        // Reset form
+        setFormData({
+          name: "",
+          email: ""
+        });
+      } else if (result.duplicate) {
+        toast({
+          title: "Already registered! 📧",
+          description: "This email is already in our waitlist. Thank you for your interest!",
+          variant: "destructive"
+        });
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast({
+        title: "Something went wrong",
+        description: "We couldn't process your request right now. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (field: string, value: string) => {
@@ -154,10 +181,11 @@ const Waitlist = () => {
                 
                 <Button 
                   type="submit" 
-                  className="w-full bg-accent hover:bg-primary text-accent-foreground hover:text-primary-foreground shadow-gold transition-all duration-300"
+                  disabled={isSubmitting}
+                  className="w-full bg-accent hover:bg-primary text-accent-foreground hover:text-primary-foreground shadow-gold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   size="lg"
                 >
-                  {t('waitlist.form.submit')}
+                  {isSubmitting ? "Joining..." : t('waitlist.form.submit')}
                 </Button>
               </form>
             </Card>
