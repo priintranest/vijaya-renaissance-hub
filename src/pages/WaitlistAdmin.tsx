@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getAllWaitlistEntries, getWaitlistCount, clearAllEntries } from "@/lib/database";
+import { LogOut, Shield } from "lucide-react";
 
 interface WaitlistEntry {
   id: number;
@@ -16,6 +18,12 @@ const WaitlistAdmin = () => {
   const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("vvf_admin_auth");
+    navigate("/login");
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -89,9 +97,20 @@ const WaitlistAdmin = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="container mx-auto max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-playfair font-bold text-primary mb-4">
-            Waitlist Admin Dashboard
-          </h1>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <Shield className="w-5 h-5 text-green-600" />
+              </div>
+              <h1 className="text-3xl font-playfair font-bold text-primary">
+                Waitlist Admin Dashboard
+              </h1>
+            </div>
+            <Button onClick={handleLogout} variant="outline" className="flex items-center space-x-2">
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </Button>
+          </div>
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground">
               Total registrations: <span className="font-bold text-primary">{count}</span>

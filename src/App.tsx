@@ -7,7 +7,9 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Waitlist from "./pages/Waitlist";
+import Login from "./pages/Login";
 import WaitlistAdmin from "./pages/WaitlistAdmin";
+import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,7 +25,17 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/waitlist" element={<Waitlist />} />
-            <Route path="/admin/waitlist" element={<WaitlistAdmin />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <WaitlistAdmin />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/waitlist" element={
+              <ProtectedRoute>
+                <WaitlistAdmin />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
