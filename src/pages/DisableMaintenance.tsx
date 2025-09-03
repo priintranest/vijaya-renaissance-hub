@@ -9,7 +9,7 @@ const DisableMaintenance = () => {
     localStorage.removeItem("vvf_maintenance_mode");
     
     // Show confirmation and redirect
-    alert("✅ Maintenance mode DISABLED. Site is now live for users.");
+    alert("✅ SITE RESTORED: Payment maintenance mode disabled. Site is now live and accessible to all users.");
     
     // Redirect to home
     navigate("/");
@@ -18,8 +18,8 @@ const DisableMaintenance = () => {
   return (
     <div className="min-h-screen bg-green-100 flex items-center justify-center">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-green-800">Disabling Maintenance Mode...</h1>
-        <p className="text-green-600">Please wait...</p>
+        <h1 className="text-2xl font-bold text-green-800">Restoring Site Access...</h1>
+        <p className="text-green-600">Site will be live shortly...</p>
       </div>
     </div>
   );
