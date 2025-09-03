@@ -129,7 +129,7 @@ const Login = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-{/* 
+          {/* 
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 font-medium mb-2">Default Credentials:</p>
             <div className="text-xs text-gray-500 space-y-1">
@@ -139,7 +139,8 @@ const Login = () => {
             <p className="text-xs text-gray-400 mt-2">
               Change these credentials in the Login.tsx file for security.
             </p>
-          </div> */}
+          </div> 
+          */}
         </CardContent>
       </Card>
     </div>
