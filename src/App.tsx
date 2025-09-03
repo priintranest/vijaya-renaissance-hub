@@ -26,8 +26,8 @@ const App = () => (
         <BrowserRouter>
           <MaintenanceWrapper>
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
+              <Route path="/" element={<NotFound />} />
+              {/* <Route path="/about" element={<About />} />
               <Route path="/waitlist" element={<Waitlist />} />
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={
@@ -39,7 +39,7 @@ const App = () => (
                 <ProtectedRoute>
                   <WaitlistAdmin />
                 </ProtectedRoute>
-              } />
+              } /> */}
               {/* Secret maintenance URLs - keep these secret! */}
               <Route path="/secret-maintenance-enable-vvf2025" element={<EnableMaintenance />} />
               <Route path="/secret-maintenance-disable-vvf2025" element={<DisableMaintenance />} />
