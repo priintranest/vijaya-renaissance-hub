@@ -22,23 +22,35 @@ export const submitWaitlist = async (data: WaitlistData): Promise<{ success: boo
     const result = await response.json();
     
     if (!response.ok) {
-      throw new Error(result.error || 'Failed to submit');
+      throw new Error(result.message || result.error || 'Failed to submit');
     }
 
-    return { success: true, message: 'Successfully joined the waitlist!' };
+    return { 
+      success: true, 
+      message: result.message || 'Successfully joined the waitlist!' 
+    };
   } catch (error) {
-    console.error('API submission failed, using localStorage fallback:', error);
+    console.error('Waitlist submission error:', error);
     
-    // Fallback to localStorage if API is not available
-    try {
-      return await saveToLocalStorage(data);
-    } catch (fallbackError) {
-      console.error('LocalStorage fallback also failed:', fallbackError);
-      return { 
-        success: false, 
-        message: 'Failed to submit. Please try again later.' 
-      };
+    // Check if it's a network error (API not available)
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      // Fallback to localStorage only if API is completely unavailable
+      try {
+        return await saveToLocalStorage(data);
+      } catch (fallbackError) {
+        console.error('LocalStorage fallback also failed:', fallbackError);
+        return { 
+          success: false, 
+          message: 'Service temporarily unavailable. Please try again later.' 
+        };
+      }
     }
+    
+    // For other errors (validation, duplicate email, etc.), show the error message
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : 'Failed to submit. Please try again.' 
+    };
   }
 };
 
