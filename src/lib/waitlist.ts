@@ -11,6 +11,8 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
 
 export const submitWaitlist = async (data: WaitlistData): Promise<{ success: boolean; message: string }> => {
   try {
+    console.log('Submitting to API:', `${API_BASE_URL}/waitlist`);
+    
     const response = await fetch(`${API_BASE_URL}/waitlist`, {
       method: 'POST',
       headers: {
@@ -19,7 +21,17 @@ export const submitWaitlist = async (data: WaitlistData): Promise<{ success: boo
       body: JSON.stringify(data),
     });
 
+    console.log('API Response status:', response.status, response.statusText);
+    
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Non-JSON response received:', await response.text());
+      throw new Error(`Server returned non-JSON response (${response.status}). API might be misconfigured.`);
+    }
+    
     const result = await response.json();
+    console.log('API Response data:', result);
     
     if (!response.ok) {
       throw new Error(result.message || result.error || 'Failed to submit');
@@ -32,9 +44,13 @@ export const submitWaitlist = async (data: WaitlistData): Promise<{ success: boo
   } catch (error) {
     console.error('Waitlist submission error:', error);
     
-    // Check if it's a network error (API not available)
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      // Fallback to localStorage only if API is completely unavailable
+    // Check if it's a network error (API not available) or a non-JSON response
+    if ((error instanceof TypeError && error.message.includes('fetch')) ||
+        (error instanceof Error && error.message.includes('non-JSON response'))) {
+      
+      console.log('API unavailable or misconfigured, falling back to localStorage');
+      
+      // Fallback to localStorage only if API is completely unavailable or misconfigured
       try {
         return await saveToLocalStorage(data);
       } catch (fallbackError) {
