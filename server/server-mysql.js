@@ -164,6 +164,39 @@ app.post('/secret-maintenance-disable-vvf-2024', (req, res) => {
   });
 });
 
+// Admin waitlist data endpoint - secured by secret token
+app.get('/api/admin/waitlist', async (req, res) => {
+  // Simple token-based security - in production, use proper authentication
+  const adminToken = req.headers['admin-token'];
+  const validToken = 'vvf-admin-secret-2024'; // In production, use environment variables
+  
+  if (!adminToken || adminToken !== validToken) {
+    return res.status(401).json({
+      success: false,
+      error: 'Unauthorized'
+    });
+  }
+  
+  try {
+    // Get all waitlist entries
+    const [rows] = await pool.execute(
+      'SELECT id, name, email, phone, interest, submitted_at FROM waitlist_entries ORDER BY submitted_at DESC'
+    );
+    
+    res.json({
+      success: true,
+      entries: rows,
+      count: rows.length
+    });
+  } catch (error) {
+    console.error('❌ Error fetching waitlist entries:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch waitlist entries'
+    });
+  }
+});
+
 // Public waitlist submission
 app.post('/api/waitlist', async (req, res) => {
   const { name, email, phone, interest } = req.body;

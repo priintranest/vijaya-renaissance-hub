@@ -8,6 +8,7 @@ import MaintenanceWrapper from "@/components/MaintenanceWrapper";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Waitlist from "./pages/Waitlist";
+import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import WaitlistAdmin from "./pages/WaitlistAdmin";
 import EnableMaintenance from "./pages/EnableMaintenance";
@@ -40,6 +41,7 @@ const App = () => (
                   <WaitlistAdmin />
                 </ProtectedRoute>
               } />
+              <Route path="/admin/database" element={<Admin />} />
               {/* Secret maintenance URLs - keep these secret! */}
               <Route path="/secret-maintenance-enable-vvf2025" element={<EnableMaintenance />} />
               <Route path="/secret-maintenance-disable-vvf2025" element={<DisableMaintenance />} />
