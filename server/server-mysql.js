@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, '../dist')));
 // Database configuration
 const dbConfig = {
   host: 'localhost',
-  user: 'root',
+  user: 'vvf_user',
   password: '1001', // Using your provided local MySQL password
   database: 'vvf_waitlist',
   waitForConnections: true,
