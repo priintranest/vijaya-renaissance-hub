@@ -15,7 +15,7 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
 const Admin = () => {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [adminToken, setAdminToken] = useState('');
+  const [adminToken, setAdminToken] = useState(''); // Empty by default in production
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
 
