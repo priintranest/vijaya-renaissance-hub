@@ -17,7 +17,7 @@ if (!fs.existsSync(logsDir)) {
 const dbConfig = {
   host: 'localhost',
   user: 'vvf_user',
-  password: 'your_secure_password_here', 
+  password: '1001', 
   database: 'vvf_waitlist',
   connectionLimit: 10
 };

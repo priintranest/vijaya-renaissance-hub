@@ -7,7 +7,7 @@ const path = require('path');
 const dbConfig = {
   host: 'localhost',
   user: 'vvf_user',
-  password: 'your_secure_password_here', // Change this to match your SQL script
+  password: '1001', // Updated to match MySQL password
   database: 'vvf_waitlist',
   waitForConnections: true,
   connectionLimit: 10,
