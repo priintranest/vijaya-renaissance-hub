@@ -195,6 +195,15 @@ app.get('/api/admin/waitlist', async (req, res) => {
   }
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: 'API server is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Public waitlist submission
 app.post('/api/waitlist', async (req, res) => {
   const { name, email, phone, interest } = req.body;
