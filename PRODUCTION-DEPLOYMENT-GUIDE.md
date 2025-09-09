@@ -63,6 +63,61 @@ CREATE TABLE waitlist_entries (
 EXIT;
 ```
 
+#### Updating MySQL Password
+
+If you need to update the MySQL password later, you can use the provided script:
+
+```bash
+# Upload the script to your server
+scp server/update-mysql-password.sh user@your-server:/var/www/vvf-waitlist/server/
+
+# SSH into your server
+ssh user@your-server
+
+# Make the script executable
+cd /var/www/vvf-waitlist/server
+chmod +x update-mysql-password.sh
+
+# Edit the script to set your desired new password
+nano update-mysql-password.sh
+# Change the NEW_PASSWORD variable at the top of the file
+
+# Run the script
+./update-mysql-password.sh
+```
+
+The script will:
+1. Update the MySQL user password
+2. Update all configuration files with the new password
+3. Restart the application server
+4. Create backups of all modified files
+
+#### Resetting a Forgotten MySQL Password
+
+If you've forgotten your MySQL password on the production server, use the dedicated password reset script:
+
+```bash
+# Upload the reset script to your server
+scp server/reset-mysql-password.sh user@your-server:/tmp/
+
+# SSH into your server
+ssh user@your-server
+
+# Make the script executable and run it
+cd /tmp
+chmod +x reset-mysql-password.sh
+sudo ./reset-mysql-password.sh
+```
+
+The reset script will:
+1. Reset the MySQL root password using the safe mode method
+2. Update the application user password
+3. Update all configuration files
+4. Restart services
+5. Create backups of modified files
+
+For more detailed instructions, see the `RESET-MYSQL-PASSWORD.md` guide.
+
 ### 4. Configure the Server Application
 
 Edit the server-mysql.js file to use production settings:
