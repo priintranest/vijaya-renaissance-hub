@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3002; // Changed from 3001 to 3002
+const PORT = process.env.PORT || 3003; // Changed to 3003 to avoid port conflicts
 
 // Middleware
 app.use(cors());

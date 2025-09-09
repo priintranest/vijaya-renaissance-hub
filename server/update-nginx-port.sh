@@ -2,7 +2,7 @@
 # This script updates the Nginx configuration to use the new port
 
 NGINX_CONFIG_PATH="/etc/nginx/sites-available/thevvf.org"
-NEW_PORT=3002
+NEW_PORT=3003
 
 # Check if the Nginx config file exists
 if [ ! -f "$NGINX_CONFIG_PATH" ]; then

@@ -1,6 +1,6 @@
 # Production Deployment Guide for Vijaya Renaissance Hub Waitlist
 
-This guide walks through the steps to deploy the Vijaya Renaissance Hub waitlist application to your production server.
+This guide walks through the steps to deploy the Vijaya Renaissance Hub waitlist application to your production server. It includes solutions to common issues that may arise during deployment.
 
 ## Prerequisites
 
@@ -300,21 +300,125 @@ pm2 set pm2-logrotate:retain 7
 
 ## Troubleshooting
 
-### If the API is not accessible:
-1. Check PM2 status: `pm2 status`
-2. Check logs: `pm2 logs vvf-waitlist`
-3. Verify Nginx configuration: `sudo nginx -t`
-4. Check Nginx logs: `sudo tail -f /var/log/nginx/error.log`
+### Port Already in Use Errors
 
-### If database connections fail:
-1. Check MySQL service: `sudo systemctl status mysql`
-2. Verify database user: `mysql -u vvf_user -p`
-3. Check server logs: `pm2 logs vvf-waitlist`
+If you receive the error `EADDRINUSE: address already in use`, this means another process is using the same port. To fix this:
+
+1. Check what processes are running on the port:
+   ```bash
+   sudo lsof -i :3003
+   ```
+
+2. If PM2 shows multiple processes that might be conflicting, clean everything up:
+   ```bash
+   # Upload the clean-start-pm2.sh script first
+   chmod +x clean-start-pm2.sh
+   ./clean-start-pm2.sh
+   ```
+
+3. If port 3003 is still busy, try editing server-mysql.js to use a different port (e.g., 3004), and update your Nginx configuration.
+
+### MySQL Connection Issues
+
+If you see `Access denied for user` errors:
+
+1. Verify your MySQL configuration in server-mysql.js:
+   ```javascript
+   const dbConfig = {
+     host: 'localhost',
+     user: 'vvf_user',
+     password: '1001',
+     database: 'vvf_waitlist',
+     // ...
+   };
+   ```
+
+2. Check if the MySQL user exists and has proper permissions:
+   ```bash
+   mysql -u root -p
+   ```
+   
+   In MySQL prompt:
+   ```sql
+   SELECT user, host FROM mysql.user WHERE user = 'vvf_user';
+   SHOW GRANTS FOR 'vvf_user'@'localhost';
+   ```
+
+3. If needed, recreate the user with proper permissions:
+   ```sql
+   CREATE USER IF NOT EXISTS 'vvf_user'@'localhost' IDENTIFIED BY '1001';
+   GRANT ALL PRIVILEGES ON vvf_waitlist.* TO 'vvf_user'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+### Nginx Configuration Issues
+
+If your API calls return HTML instead of JSON:
+
+1. Verify your Nginx configuration:
+   ```bash
+   sudo nginx -t
+   ```
+
+2. Check that the proxy_pass directive points to the correct port:
+   ```
+   location /api/ {
+       proxy_pass http://localhost:3003;
+       # ...
+   }
+   ```
+
+3. Restart Nginx after making changes:
+   ```bash
+   sudo systemctl reload nginx
+   ```
+
+### PM2 Process Management
+
+If you have multiple conflicting PM2 processes:
+
+1. List all processes:
+   ```bash
+   pm2 list
+   ```
+
+2. Delete all processes to start fresh:
+   ```bash
+   pm2 delete all
+   ```
+
+3. Start your server with a specific name:
+   ```bash
+   pm2 start server-mysql.js --name vvf-waitlist
+   ```
+
+4. Save the configuration:
+   ```bash
+   pm2 save
+   ```
+
+### General Debugging
+
+1. Check server logs:
+   ```bash
+   pm2 logs vvf-waitlist
+   ```
+
+2. Check Nginx logs:
+   ```bash
+   sudo tail -f /var/log/nginx/error.log
+   sudo tail -f /var/log/nginx/access.log
+   ```
+
+3. Test API endpoints directly:
+   ```bash
+   curl -v http://localhost:3003/api/health
+   ```
 
 ## Security Notes
 
-1. The admin token should be a secure random string, not the default value.
-2. Set strong passwords for the MySQL user.
+1. The admin token should be a secure random string, not the default value (`vvf-admin-secret-2024`).
+2. Set strong passwords for the MySQL user (stronger than `1001`).
 3. Keep your server updated with security patches.
 4. Consider adding rate limiting to the API endpoints.
 5. Regularly back up your database.
