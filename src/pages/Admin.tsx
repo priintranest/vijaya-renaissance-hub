@@ -7,63 +7,40 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://thevvf.org/api' 
-  : 'http://localhost:3001/api';
+import { fetchWaitlistEntries } from "@/lib/waitlist";
 
 const Admin = () => {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [adminToken, setAdminToken] = useState(''); // Empty by default in production
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
 
-  const fetchWaitlistEntries = async () => {
-    if (!adminToken) {
-      toast({
-        title: "Authentication Required",
-        description: "Please enter the admin token.",
-        variant: "destructive"
-      });
-      return;
-    }
+  const fetchWaitlistEntriesFromAPI = async () => {
+    // For the external API, we don't need admin token authentication
+    // The X-API-TOKEN is handled internally by the fetchWaitlistEntries function
     
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/waitlist`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Admin-Token': adminToken
-        }
-      });
+      const result = await fetchWaitlistEntries();
       
-      if (!response.ok) {
-        if (response.status === 401) {
-          toast({
-            title: "Authentication Failed",
-            description: "Invalid admin token.",
-            variant: "destructive"
-          });
-          setIsAuthenticated(false);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch waitlist entries.",
-            variant: "destructive"
-          });
-        }
-        throw new Error(`API error: ${response.status}`);
+      if (!result.success) {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to fetch waitlist entries.",
+          variant: "destructive"
+        });
+        throw new Error(result.message || 'Failed to fetch entries');
       }
       
-      const data = await response.json();
-      setEntries(data.entries);
+      const data = result;
+      // Handle different response formats from external API
+      const entriesData = data.data || data.entries || [];
+      setEntries(entriesData);
       setIsAuthenticated(true);
       
       toast({
         title: "Data Loaded",
-        description: `Loaded ${data.entries.length} waitlist entries.`
+        description: `Loaded ${entriesData.length} waitlist entries.`
       });
     } catch (error) {
       console.error('Failed to fetch entries:', error);
@@ -136,29 +113,22 @@ const Admin = () => {
         </div>
       </section>
 
-      {/* Authentication Section */}
+      {/* Load Data Section */}
       {!isAuthenticated && (
         <section className="py-8 px-6">
           <div className="container mx-auto max-w-md">
             <Card className="p-6 shadow-md">
-              <h2 className="text-2xl font-semibold mb-4">Authentication Required</h2>
+              <h2 className="text-2xl font-semibold mb-4">Load Waitlist Data</h2>
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="adminToken">Admin Token</Label>
-                  <Input 
-                    id="adminToken" 
-                    type="password" 
-                    value={adminToken} 
-                    onChange={(e) => setAdminToken(e.target.value)}
-                    placeholder="Enter admin token" 
-                  />
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Click below to load waitlist entries from the external API.
+                </p>
                 <Button 
                   className="w-full" 
-                  onClick={fetchWaitlistEntries}
+                  onClick={fetchWaitlistEntriesFromAPI}
                   disabled={isLoading}
                 >
-                  {isLoading ? "Authenticating..." : "Access Admin Panel"}
+                  {isLoading ? "Loading..." : "Load Waitlist Data"}
                 </Button>
               </div>
             </Card>
@@ -173,7 +143,7 @@ const Admin = () => {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold">Waitlist Entries ({entries.length})</h2>
               <div className="space-x-2">
-                <Button variant="outline" onClick={fetchWaitlistEntries} disabled={isLoading}>
+                <Button variant="outline" onClick={fetchWaitlistEntriesFromAPI} disabled={isLoading}>
                   {isLoading ? "Loading..." : "Refresh Data"}
                 </Button>
                 <Button onClick={handleExport} disabled={!entries.length}>
