@@ -72,6 +72,56 @@ const Leads = () => {
     }
   };
 
+  // Delete lead function
+  const handleDelete = async (leadId: number) => {
+    // Confirm deletion
+    if (!window.confirm(`Are you sure you want to delete lead #${leadId}? This action cannot be undone.`)) {
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      console.log(`🗑️ Deleting lead ${leadId}...`);
+      
+      const response = await fetch(`https://api.esamudaay.com/api/waitlist/${leadId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-TOKEN': 'STATIC_WAITLIST_TOKEN',
+        },
+      });
+
+      console.log("🗑️ Delete response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log("🗑️ Delete response:", result);
+
+      toast({
+        title: "Success! ✅",
+        description: `Lead #${leadId} deleted successfully`,
+      });
+
+      // Refresh the leads list after successful deletion
+      await fetchLeads();
+
+    } catch (err) {
+      console.error("❌ Delete error:", err);
+      const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+      toast({
+        title: "Delete Failed ❌",
+        description: `Failed to delete lead: ${errorMessage}`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Auto-load on mount
   useEffect(() => {
     fetchLeads();
@@ -121,29 +171,28 @@ const Leads = () => {
                   <th className="text-left p-4 font-semibold text-gray-700">ID</th>
                   <th className="text-left p-4 font-semibold text-gray-700">Name</th>
                   <th className="text-left p-4 font-semibold text-gray-700">Email</th>
-                  <th className="text-left p-4 font-semibold text-gray-700">Phone</th>
-                  <th className="text-left p-4 font-semibold text-gray-700">Interest</th>
                   <th className="text-left p-4 font-semibold text-gray-700">Submitted At</th>
+                  <th className="text-center p-4 font-semibold text-gray-700">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center">
+                    <td colSpan={5} className="p-8 text-center">
                       <div className="animate-spin inline-block w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div>
                       <p className="text-gray-600">Loading leads...</p>
                     </td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center">
+                    <td colSpan={5} className="p-8 text-center">
                       <div className="text-red-600 mb-2">❌ Error loading data</div>
                       <p className="text-sm text-gray-600">{error}</p>
                     </td>
                   </tr>
                 ) : leads.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center">
+                    <td colSpan={5} className="p-8 text-center">
                       <div className="text-gray-500">📭 No leads found</div>
                     </td>
                   </tr>
@@ -167,20 +216,6 @@ const Leads = () => {
                         <span className="text-blue-600 hover:underline">{lead.email}</span>
                       </td>
                       <td className="p-4">
-                        {lead.phone ? (
-                          <span className="text-gray-700">{lead.phone}</span>
-                        ) : (
-                          <span className="text-gray-400 italic">N/A</span>
-                        )}
-                      </td>
-                      <td className="p-4">
-                        {lead.interest ? (
-                          <span className="text-gray-700">{lead.interest}</span>
-                        ) : (
-                          <span className="text-gray-400 italic">N/A</span>
-                        )}
-                      </td>
-                      <td className="p-4">
                         <div className="text-sm">
                           <div className="text-gray-900 font-medium">
                             {new Date(lead.submitted_at).toLocaleDateString()}
@@ -189,6 +224,17 @@ const Leads = () => {
                             {new Date(lead.submitted_at).toLocaleTimeString()}
                           </div>
                         </div>
+                      </td>
+                      <td className="p-4 text-center">
+                        <Button
+                          onClick={() => handleDelete(lead.id)}
+                          variant="destructive"
+                          size="sm"
+                          className="bg-red-500 hover:bg-red-600 text-white"
+                          disabled={isLoading}
+                        >
+                          🗑️ Delete
+                        </Button>
                       </td>
                     </tr>
                   ))
