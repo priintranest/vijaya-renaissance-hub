@@ -47,11 +47,11 @@ const Login = () => {
       
       toast({
         title: "Login Successful! 🎉",
-        description: "Welcome to the admin dashboard.",
+        description: "Welcome to the leads dashboard.",
       });
 
-      // Redirect to admin dashboard
-      navigate("/admin");
+      // Redirect to leads dashboard
+      navigate("/leads");
     } else {
       toast({
         title: "Login Failed ❌",

@@ -15,6 +15,7 @@ import WaitlistAdmin from "./pages/WaitlistAdmin";
 import EnableMaintenance from "./pages/EnableMaintenance";
 import DisableMaintenance from "./pages/DisableMaintenance";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Leads from "./pages/Leads";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
               } />
               <Route path="/admin/database" element={<Admin />} />
               <Route path="/api-test" element={<APITest />} />
+              <Route path="/leads" element={<Leads />} />
               {/* Secret maintenance URLs - keep these secret! */}
               <Route path="/secret-maintenance-enable-vvf2025" element={<EnableMaintenance />} />
               <Route path="/secret-maintenance-disable-vvf2025" element={<DisableMaintenance />} />
