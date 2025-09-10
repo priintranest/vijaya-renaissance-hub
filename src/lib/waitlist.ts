@@ -126,13 +126,50 @@ export const fetchWaitlistEntries = async (): Promise<{ success: boolean; data?:
 
     console.log('API Response status:', response.status, response.statusText);
     
-    const result = await API_CONFIG.handleResponse(response);
-    console.log('API Response data:', result);
+    // Get the raw response text first to see what we're dealing with
+    const responseText = await response.text();
+    console.log('Raw API response:', responseText);
+    
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}: ${responseText}`);
+    }
+    
+    // Try to parse as JSON
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse JSON:', parseError);
+      throw new Error('API returned invalid JSON response');
+    }
+    
+    console.log('Parsed API Response data:', result);
+
+    // Handle different response formats
+    let entriesArray = [];
+    
+    if (Array.isArray(result)) {
+      // Direct array response
+      entriesArray = result;
+    } else if (result.data && Array.isArray(result.data)) {
+      // Wrapped in data property
+      entriesArray = result.data;
+    } else if (result.entries && Array.isArray(result.entries)) {
+      // Wrapped in entries property
+      entriesArray = result.entries;
+    } else if (typeof result === 'object' && result !== null) {
+      // Single object response, wrap in array
+      entriesArray = [result];
+    } else {
+      // Unknown format, return empty array
+      console.warn('Unknown response format:', result);
+      entriesArray = [];
+    }
 
     return { 
       success: true, 
-      data: result.data || result || [], // Handle different response formats
-      message: result.message || 'Successfully fetched waitlist entries' 
+      data: entriesArray,
+      message: `Successfully fetched ${entriesArray.length} waitlist entries` 
     };
   } catch (error) {
     console.error('Waitlist fetch error:', error);

@@ -34,7 +34,11 @@ const Admin = () => {
       
       const data = result;
       // Handle different response formats from external API
-      const entriesData = data.data || data.entries || [];
+      const entriesData = data.data || [];
+      console.log('Entries data received:', entriesData);
+      console.log('Type of entries data:', typeof entriesData);
+      console.log('Is entries data an array?', Array.isArray(entriesData));
+      
       setEntries(entriesData);
       setIsAuthenticated(true);
       
