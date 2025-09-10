@@ -2,55 +2,75 @@ import React, { useState, useEffect } from "react";
 import Navigation from "@/components/ui/navigation";
 import Footer from "@/components/ui/footer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { fetchWaitlistEntries } from "@/lib/waitlist";
+
+interface WaitlistEntry {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  interest?: string;
+  submitted_at: string;
+}
 
 const Admin = () => {
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
 
-  const fetchWaitlistEntriesFromAPI = async () => {
-    // For the external API, we don't need admin token authentication
-    // The X-API-TOKEN is handled internally by the fetchWaitlistEntries function
-    
+  // Fetch waitlist data from external API
+  const fetchWaitlistData = async () => {
     setIsLoading(true);
     try {
-      const result = await fetchWaitlistEntries();
+      console.log('Fetching data from external API...');
       
-      if (!result.success) {
-        toast({
-          title: "Error",
-          description: result.message || "Failed to fetch waitlist entries.",
-          variant: "destructive"
-        });
-        throw new Error(result.message || 'Failed to fetch entries');
+      const response = await fetch('https://api.esamudaay.com/api/waitlist', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-TOKEN': 'STATIC_WAITLIST_TOKEN',
+        },
+      });
+
+      console.log('API response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const data = await response.json();
+      console.log('API response data:', data);
+
+      // Handle different possible response formats
+      let entriesArray: WaitlistEntry[] = [];
       
-      const data = result;
-      // Handle different response formats from external API
-      const entriesData = data.data || [];
-      console.log('Entries data received:', entriesData);
-      console.log('Type of entries data:', typeof entriesData);
-      console.log('Is entries data an array?', Array.isArray(entriesData));
-      
-      setEntries(entriesData);
-      setIsAuthenticated(true);
+      if (Array.isArray(data)) {
+        entriesArray = data;
+      } else if (data.data && Array.isArray(data.data)) {
+        entriesArray = data.data;
+      } else if (data.entries && Array.isArray(data.entries)) {
+        entriesArray = data.entries;
+      } else if (data.waitlist && Array.isArray(data.waitlist)) {
+        entriesArray = data.waitlist;
+      } else {
+        console.log('Unexpected data format:', data);
+        entriesArray = [];
+      }
+
+      setEntries(entriesArray);
       
       toast({
-        title: "Data Loaded",
-        description: `Loaded ${entriesData.length} waitlist entries.`
+        title: "Success",
+        description: `Loaded ${entriesArray.length} waitlist entries`,
       });
+
     } catch (error) {
-      console.error('Failed to fetch entries:', error);
+      console.error('Failed to fetch waitlist data:', error);
       toast({
         title: "Error",
-        description: "Failed to load data from the server.",
+        description: "Failed to fetch waitlist data. Check console for details.",
         variant: "destructive"
       });
     } finally {
@@ -58,32 +78,36 @@ const Admin = () => {
     }
   };
 
+  // Load data on component mount
+  useEffect(() => {
+    fetchWaitlistData();
+  }, []);
+
+  // Export to CSV
   const handleExport = () => {
     if (!entries.length) {
       toast({
         title: "No Data",
-        description: "There are no entries to export.",
+        description: "No entries to export",
         variant: "destructive"
       });
       return;
     }
-    
-    // Create CSV content
+
     const headers = ['ID', 'Name', 'Email', 'Phone', 'Interest', 'Submitted At'];
     const csvRows = [
       headers.join(','),
       ...entries.map(entry => [
-        entry.id,
-        `"${entry.name.replace(/"/g, '""')}"`,
-        `"${entry.email.replace(/"/g, '""')}"`,
-        `"${entry.phone ? entry.phone.replace(/"/g, '""') : ''}"`,
-        `"${entry.interest ? entry.interest.replace(/"/g, '""') : ''}"`,
-        entry.submitted_at
+        entry.id || '',
+        `"${(entry.name || '').replace(/"/g, '""')}"`,
+        `"${(entry.email || '').replace(/"/g, '""')}"`,
+        `"${(entry.phone || '').replace(/"/g, '""')}"`,
+        `"${(entry.interest || '').replace(/"/g, '""')}"`,
+        entry.submitted_at || ''
       ].join(','))
     ];
+
     const csvContent = csvRows.join('\n');
-    
-    // Create and download the file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -92,106 +116,126 @@ const Admin = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    toast({
+      title: "Success",
+      description: "CSV file downloaded"
+    });
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleString();
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleString();
+    } catch {
+      return dateString;
+    }
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
       <Navigation />
       
-      {/* Header Section */}
-      <section className="pt-24 pb-16 px-6">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl lg:text-5xl font-playfair font-bold text-primary mb-6">
-            Waitlist Admin
-          </h1>
-          <div className="w-24 h-1 bg-accent mx-auto mb-8"></div>
-          <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            Manage and view waitlist entries
-          </p>
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              🍃 Waitlist Admin Dashboard
+            </h1>
+            <p className="text-gray-600">
+              Total registrations: <span className="font-semibold">{entries.length}</span>
+            </p>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button 
+              onClick={fetchWaitlistData} 
+              disabled={isLoading}
+              variant="outline"
+            >
+              {isLoading ? "Loading..." : "Refresh Data"}
+            </Button>
+            <Button 
+              onClick={handleExport}
+              disabled={!entries.length}
+            >
+              Export to CSV
+            </Button>
+          </div>
         </div>
-      </section>
 
-      {/* Load Data Section */}
-      {!isAuthenticated && (
-        <section className="py-8 px-6">
-          <div className="container mx-auto max-w-md">
-            <Card className="p-6 shadow-md">
-              <h2 className="text-2xl font-semibold mb-4">Load Waitlist Data</h2>
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Click below to load waitlist entries from the external API.
-                </p>
-                <Button 
-                  className="w-full" 
-                  onClick={fetchWaitlistEntriesFromAPI}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Loading..." : "Load Waitlist Data"}
-                </Button>
-              </div>
-            </Card>
-          </div>
-        </section>
-      )}
-
-      {/* Data Section */}
-      {isAuthenticated && (
-        <section className="py-8 px-6">
-          <div className="container mx-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold">Waitlist Entries ({entries.length})</h2>
-              <div className="space-x-2">
-                <Button variant="outline" onClick={fetchWaitlistEntriesFromAPI} disabled={isLoading}>
-                  {isLoading ? "Loading..." : "Refresh Data"}
-                </Button>
-                <Button onClick={handleExport} disabled={!entries.length}>
-                  Export CSV
-                </Button>
-              </div>
+        {/* Data Table */}
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Recent Registrations</h2>
+          
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+              <p className="mt-2 text-gray-600">Loading waitlist data...</p>
             </div>
-            
-            {entries.length > 0 ? (
-              <div className="border rounded-lg overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[80px]">ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Interest</TableHead>
-                      <TableHead className="w-[180px]">Submitted At</TableHead>
+          ) : entries.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>No registrations yet. Share your waitlist page to get started!</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Interest</TableHead>
+                    <TableHead>Submitted</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {entries.map((entry) => (
+                    <TableRow key={entry.id}>
+                      <TableCell className="font-mono text-sm">
+                        {entry.id || 'N/A'}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {entry.name || 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        {entry.email || 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        {entry.phone || 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        {entry.interest || 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-600">
+                        {formatDate(entry.submitted_at)}
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {entries.map((entry) => (
-                      <TableRow key={entry.id}>
-                        <TableCell>{entry.id}</TableCell>
-                        <TableCell className="font-medium">{entry.name}</TableCell>
-                        <TableCell>{entry.email}</TableCell>
-                        <TableCell>{entry.phone || '-'}</TableCell>
-                        <TableCell>{entry.interest || '-'}</TableCell>
-                        <TableCell>{formatDate(entry.submitted_at)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center py-12 bg-muted rounded-lg">
-                <p className="text-lg text-muted-foreground">No waitlist entries found.</p>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </Card>
 
+        {/* Debug Info */}
+        <Card className="mt-6 p-4 bg-gray-50">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Debug Info</h3>
+          <p className="text-xs text-gray-600">
+            API Endpoint: https://api.esamudaay.com/api/waitlist
+          </p>
+          <p className="text-xs text-gray-600">
+            Last Updated: {new Date().toLocaleString()}
+          </p>
+          <p className="text-xs text-gray-600">
+            Entries Found: {entries.length}
+          </p>
+        </Card>
+      </div>
+      
       <Footer />
     </div>
   );
