@@ -10,6 +10,8 @@ export interface WaitlistData {
 export const submitWaitlist = async (data: WaitlistData): Promise<{ success: boolean; message: string; duplicate?: boolean }> => {
   try {
     console.log('Submitting to API:', API_CONFIG.EXTERNAL_API_URL);
+    console.log('Submission data:', data);
+    console.log('Request headers:', API_CONFIG.getHeaders());
     
     const response = await fetch(API_CONFIG.EXTERNAL_API_URL, {
       method: 'POST',
@@ -21,22 +23,48 @@ export const submitWaitlist = async (data: WaitlistData): Promise<{ success: boo
 
     console.log('API Response status:', response.status, response.statusText);
     
-    const result = await API_CONFIG.handleResponse(response);
+    // Handle response based on status
+    if (!response.ok) {
+      // Get response data for error handling
+      const contentType = response.headers.get('content-type');
+      let errorData;
+      
+      try {
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await response.json();
+        } else {
+          errorData = { error: await response.text() };
+        }
+      } catch {
+        errorData = { error: 'Unknown error occurred' };
+      }
+      
+      console.log('API Error data:', errorData);
+      
+      // Check for duplicate email error
+      if (response.status === 400 && (
+          errorData.error?.toLowerCase().includes('duplicate') || 
+          errorData.error?.toLowerCase().includes('unique') ||
+          errorData.error?.toLowerCase().includes('already exists') ||
+          errorData.message?.toLowerCase().includes('duplicate') ||
+          errorData.message?.toLowerCase().includes('unique') ||
+          errorData.message?.toLowerCase().includes('already exists')
+        )) {
+        return { 
+          success: false, 
+          message: 'This email is already registered in our waitlist',
+          duplicate: true 
+        };
+      }
+      
+      // Other error types
+      throw new Error(errorData.error || errorData.message || `API request failed with status ${response.status}`);
+    }
+    
+    // Success response
+    const result = await response.json();
     console.log('API Response data:', result);
     
-    // Check for duplicate email error
-    if (response.status === 400 && (
-        result.error?.toLowerCase().includes('duplicate') || 
-        result.error?.toLowerCase().includes('unique') ||
-        result.error?.toLowerCase().includes('already exists')
-      )) {
-      return { 
-        success: false, 
-        message: 'This email is already registered in our waitlist',
-        duplicate: true 
-      };
-    }
-
     return { 
       success: true, 
       message: result.message || 'Successfully joined the waitlist!' 
@@ -47,6 +75,39 @@ export const submitWaitlist = async (data: WaitlistData): Promise<{ success: boo
     return { 
       success: false, 
       message: error instanceof Error ? error.message : 'Failed to submit. Please try again.' 
+    };
+  }
+};
+
+// Test function to verify API connectivity
+export const testAPIConnection = async (): Promise<{ success: boolean; message: string }> => {
+  try {
+    console.log('Testing API connection to:', API_CONFIG.EXTERNAL_API_URL);
+    
+    const response = await fetch(API_CONFIG.EXTERNAL_API_URL, {
+      method: 'GET',
+      headers: API_CONFIG.getHeaders(),
+      signal: AbortSignal.timeout(5000) // 5 second timeout for test
+    });
+
+    console.log('Test API Response status:', response.status, response.statusText);
+    
+    if (response.ok) {
+      return {
+        success: true,
+        message: 'API connection successful'
+      };
+    } else {
+      return {
+        success: false,
+        message: `API returned status ${response.status}: ${response.statusText}`
+      };
+    }
+  } catch (error) {
+    console.error('API connection test failed:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to connect to API'
     };
   }
 };
